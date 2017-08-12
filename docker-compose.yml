@@ -1,0 +1,12 @@
+version: '2'
+services:
+    # nginx container
+    nginx:
+        image: nginx
+        ports:
+            - "8080:80"
+        volumes:
+            - ./docker/nginx/nginx.conf:/nginx.conf
+            - ./docker/logs/nginx:/var/log/nginx
+            - .:/var/www/html
+        command: nginx -c /nginx.conf
