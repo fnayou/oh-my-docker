@@ -1,2 +1,4 @@
 # used for docker config development
+/docker/logs
+/docker/data
 /web

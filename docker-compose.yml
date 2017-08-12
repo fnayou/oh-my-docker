@@ -11,6 +11,7 @@ services:
             - ./docker/nginx/nginx.conf:/nginx.conf
             - ./docker/logs/nginx:/var/log/nginx
         command: nginx -c /nginx.conf
+    # php container
     php:
         build:
             context: docker/php
@@ -18,3 +19,12 @@ services:
             - "9000:9000"
         volumes:
             - .:/var/www/html
+    # maria DB container
+    mariadb:
+       image: mariadb:10
+       ports:
+           - "3306:3306"
+       volumes:
+           - ./docker/data/mariadb:/var/lib/mysql
+       env_file:
+           - ./docker/mariadb/env
