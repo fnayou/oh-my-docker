@@ -16,10 +16,16 @@ before_install:
   # be non-interactive (normally it asks you a bunch of config questions).
   - sudo apt-get install -o Dpkg::Options::="--force-confold" --force-yes -y docker-ce
 
+  # Let's stop mariadb
+  - sudo service mysql stop
+  # wait for mariadb to shutdown
+  - while sudo lsof -Pi :3306 -sTCP:LISTEN -t; do sleep 1; done
   # Let's stop postgresql
   - sudo service postgresql stop
   # wait for postgresql to shutdown
   - while sudo lsof -Pi :5432 -sTCP:LISTEN -t; do sleep 1; done
+
+  - sudo apt-get install -o Dpkg::Options::="--force-confold" --force-yes -y docker-ce
 
   # Print out the current docker-compose version. Once this reports 1.6+ then we
   # do not need the following steps.

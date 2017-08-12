@@ -37,3 +37,8 @@ services:
            - ./docker/data/pgsql:/var/lib/postgresql/data
        env_file:
            - ./docker/postgres/env
+    # couch DB container
+    couchdb:
+        image: couchdb
+        ports:
+            - 5984:5984
