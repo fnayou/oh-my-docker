@@ -28,3 +28,12 @@ services:
            - ./docker/data/mariadb:/var/lib/mysql
        env_file:
            - ./docker/mariadb/env
+    # postgres DB container
+    postgres:
+       image: postgres:9
+       ports:
+           - "5432:5432"
+       volumes:
+           - ./docker/data/pgsql:/var/lib/postgresql/data
+       env_file:
+           - ./docker/postgres/env
