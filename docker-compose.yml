@@ -42,3 +42,8 @@ services:
         image: couchdb
         ports:
             - 5984:5984
+    # mongo DB container
+    mongo:
+        image: mongo
+        ports:
+            - "27017:27017"
