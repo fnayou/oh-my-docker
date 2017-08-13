@@ -1,0 +1,58 @@
+##
+# This file is part of the fnayou/oh-my-docker package.
+#
+# Copyright (c) 2017. Aymen FNAYOU <fnayou.aymen@gmail.com>
+#
+# For the full copyright and license information, please view the LICENSE
+# file that was distributed with this source code.
+##
+
+version: '2'
+services:
+    # nginx container
+    nginx:
+        image: nginx
+        ports:
+            - "8080:80"
+        volumes_from:
+            - php
+        volumes:
+            - ./docker/nginx/nginx.conf:/nginx.conf
+            - ./docker/logs/nginx:/var/log/nginx
+        command: nginx -c /nginx.conf
+    # php container
+    php:
+        build:
+            context: docker/php
+        ports:
+            - "9000:9000"
+        volumes:
+            - .:/var/www/html
+    # maria DB container
+    mariadb:
+       image: mariadb:10
+       ports:
+           - "3306:3306"
+       volumes:
+           - ./docker/data/mariadb:/var/lib/mysql
+       env_file:
+           - ./docker/mariadb/env
+    # postgres DB container
+    postgres:
+       image: postgres:9
+       ports:
+           - "5432:5432"
+       volumes:
+           - ./docker/data/pgsql:/var/lib/postgresql/data
+       env_file:
+           - ./docker/postgres/env
+    # couch DB container
+    couchdb:
+        image: couchdb
+        ports:
+            - 5984:5984
+    # mongo DB container
+    mongo:
+        image: mongo
+        ports:
+            - "27017:27017"
