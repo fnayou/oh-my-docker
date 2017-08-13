@@ -2,8 +2,6 @@
 FROM php:7.0-fpm
 
 MAINTAINER Aymen FNAYOU <fnayou.aymen@gmail.com>
-LABEL DESCRIPTION "PHP7-FPM Docker container with OPcache and graphic library"
-LABEL version="1.0"
 
 RUN apt-get update && apt-get install -y \
 
