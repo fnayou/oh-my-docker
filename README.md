@@ -95,7 +95,7 @@ alias dc='docker-compose'
 alias dcup='docker-compose up -d'
 alias dcps='docker-compose ps'
 alias dcb='docker-compose build'
-alias dcd='docker down'
+alias dcd='docker-compose down'
 alias dcs='docker stop $(docker ps -a -q) && docker rm $(docker ps -a -q)'
 
 #docker functions
