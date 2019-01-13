@@ -4,3 +4,5 @@
 /.travis.yml       export-ignore
 /LICENSE           export-ignore
 /README.md         export-ignore
+/docker-compose.yml
+/web

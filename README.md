@@ -10,8 +10,9 @@ ohMyDocker
 ## Installation
 
 1. [download the latest release][link-release] or clone the repo
-2. customize your `docker-compose.yml`
-3. Build/run containers with (with and without detached mode)
+2. rename `docker-compose.yml.dist`
+3. customize your `docker-compose.yml`
+4. Build/run containers with (with and without detached mode)
 
 ```bash
 $ docker-compose build
@@ -45,8 +46,10 @@ ohmydocker_couchdb_1     tini -- /docker-entrypoint ...   Up    0.0.0.0:5984->59
 
 With this configuration, you can set up `docker` for one or many projects. all you have to do is to :
 
-- update PHP `volumes` with paths to your projects
-- update (duplicate *project section*) within `nginx.conf` file
+* update PHP `volumes` with paths to your projects
+* rename `docker/nginx/nginx.conf.dist` to `docker/nginx/nginx.conf` and update project and mailcatcher configuration
+* rename `docker/mariadb/env.dist` to `docker/mariadb/.env` and update configuration
+* rename `docker/postgres/env.dist` to `docker/postgres/.env` and update configuration
 
 ### Nginx Container
 
@@ -55,13 +58,57 @@ Basic and full Nginx configuration within `nginx.conf` file. you can customize/d
 ```nginx
     # project configuration
     server {
-        server_name project.tld www.project.tld;
+        listen 80;
+        server_name project.loc www.project.loc;
         root /var/www/html/web;
 
-        # server configuration
+        location / {
+            # try to serve file directly, fallback to app.php
+            try_files $uri /app.php$is_args$args;
+        }
+        # PROD
+        location ~ ^/app\.php(/|$) {
+            fastcgi_pass php-upstream;
+            fastcgi_split_path_info ^(.+\.php)(/.*)$;
+            include fastcgi_params;
+            # When you are using symlinks to link the document root to the
+            # current version of your application, you should pass the real
+            # application path instead of the path to the symlink to PHP
+            # FPM.
+            # Otherwise, PHP's OPcache may not properly detect changes to
+            # your PHP files (see https://github.com/zendtech/ZendOptimizerPlus/issues/126
+            # for more information).
+            fastcgi_param  SCRIPT_FILENAME  $realpath_root$fastcgi_script_name;
+            fastcgi_param DOCUMENT_ROOT $realpath_root;
+            # Prevents URIs that include the front controller. This will 404:
+            # http://domain.tld/app.php/some-path
+            # Remove the internal directive to allow URIs like this
+            internal;
+        }
 
         error_log /var/log/nginx/project_error.log;
         access_log /var/log/nginx/project_access.log;
+    }
+
+    # mail catcher
+    server {
+        listen 80;
+        server_name mailcatcher.project.loc;
+
+        location / {
+            proxy_pass http://mailcatcher-upstream;
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection "upgrade";
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Host $server_name;
+            proxy_intercept_errors on;
+        }
+
+        error_log /var/log/nginx/mailcatcher_error.log;
+        access_log /var/log/nginx/mailcatcher_access.log;
     }
 ```
 
@@ -73,9 +120,9 @@ Built on the top of the wonderful [docker-library/php](https://github.com/docker
 
 The PHP container includes :
 
-- opcache, iconv, mcrypt, mbstring, intl, pdo, pdo_mysql, pdo_pgsql, gd and xdebug.
-- **opcache** pre configured
-- ready to use **composer**
+* opcache, iconv, mcrypt, mbstring, intl, pdo, pdo_mysql, pdo_pgsql, gd and xdebug.
+* **opcache** pre configured
+* ready to use **composer**
 
 > **timezone** set to `Europe/Paris`
 
@@ -87,29 +134,31 @@ You can customize configuration (like password, user and database) within `docke
 
 ## Useful commands
 
-I know that everyone has his own alias, functions for Docker. but here are some useful tricks.
+I know that everyone has his own alias and functions for Docker. but here are some useful tricks.
 
 ```bash
 #docker alias
-alias dc='docker-compose'
-alias dcup='docker-compose up -d'
-alias dcps='docker-compose ps'
-alias dcb='docker-compose build'
-alias dcd='docker-compose down'
-alias dcs='docker stop $(docker ps -a -q) && docker rm $(docker ps -a -q)'
+ alias dc='docker-compose'
+ alias dcup='docker-compose up -d'
+ alias dcps='docker-compose ps'
+ alias dcb='docker-compose build'
+ alias dcd='docker-compose down'
+ alias dcs='docker stop $(docker ps -a -q) && docker rm $(docker ps -a -q)'
 
-#docker functions
-dci(){ docker inspect "$@"; }
-dcip(){ docker inspect $(docker ps -f name="$@" -q) | grep IPAddress; }
-dcbash(){ docker-compose run "$@" bash; }
+ #docker functions
+ dci(){ docker inspect "$@"; }
+ dcip(){ docker inspect $(docker ps -f name="$@" -q) | grep IPAddress; }
+ dcbash(){ docker-compose run "$@" bash; }
 ```
+
 ## Credits
 
-[Aymen FNAYOU][link-author]
+- Aymen FNAYOU : [website][link-author] / [github][link-github]
 
 ## License
 
 ![license](https://img.shields.io/badge/license-MIT-lightgrey.svg) Please see [License File](LICENSE) for more information.
 
 [link-author]: https://aymen-fnayou.com
+[link-github]: https://github.com/fnayou
 [link-release]: https://github.com/fnayou/oh-my-docker/releases
