@@ -30,13 +30,40 @@ http {
     gzip_disable "msie6";
     open_file_cache max=100;
 
+    # mailcatcher conf
+    upstream mailcatcher-upstream {
+        server mailcatcher:1080;
+    }
+
+    server {
+        listen 80;
+        server_name mailcatcher.presentacio.loc;
+
+        location / {
+            proxy_pass http://mailcatcher-upstream;
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection "upgrade";
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Host $server_name;
+            proxy_intercept_errors on;
+        }
+
+        error_log /var/log/nginx/mailcatcher_error.log;
+        access_log /var/log/nginx/mailcatcher_access.log;
+    }
+
+    # php conf
     upstream php-upstream {
         server php:9000;
     }
 
     # project configuration
     server {
-        server_name project.tld www.project.tld;
+        listen 80;
+        server_name presentacio.loc www.presentacio.loc;
         root /var/www/html/web;
 
         location / {
