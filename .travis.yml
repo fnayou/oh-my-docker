@@ -45,6 +45,11 @@ before_install:
   # before doing the update.
   - docker-compose --version
 
+  # Prepare containers with .env configuration files based on .dist files
+  - cp docker/mariadb/env.dist docker/mariadb/.env
+  - cp docker/postgres/env.dist docker/postgres/.env
+  - cp docker/nginx/nginx.conf.dist docker/nginx/nginx.conf
+
   # Setup your application stack. You may need to tweak these commands if you
   # doing out-of-the-ordinary docker-compose builds.
   - docker-compose pull
