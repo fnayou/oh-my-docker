@@ -1,4 +1,13 @@
 # used for docker config development
-/docker/logs
-/docker/data
+/docker/data/*
+!docker/data/.gitkeep
+/docker/logs/*
+!docker/logs/.gitkeep
+/docker/mariadb/*
+!docker/mariadb/env.dist
+/docker/nginx/*
+!docker/nginx/nginx.conf.dist
+/docker/postgres/*
+!docker/postgres/env.dist
+docker-compose.yml
 /web
