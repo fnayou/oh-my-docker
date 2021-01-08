@@ -1,7 +1,7 @@
 ohMyDocker
 ============
 
-<img src="http://data.aymen-fnayou.com/oh-my-docker_logo.png" width="120px" align="left"/>
+<img src="https://cloud.aymen.fr/s/tWtwCm5kZkL73wn/download" width="120px" align="left"/>
 
 [![Build Status](https://travis-ci.org/fnayou/oh-my-docker.svg?branch=master)](https://travis-ci.org/fnayou/oh-my-docker)
 
